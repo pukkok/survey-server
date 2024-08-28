@@ -12,19 +12,23 @@ const UserSchema = new Schema({
     email: {
         type: String,
         required: true,
+        trim: true
     },
     phone: {
         type: String,
         required: true,
+        trim: true
     },
     userId: {
         type: String,
         required: true,
+        trim: true,
         unique: true
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     createdAt: {
         type: Date,

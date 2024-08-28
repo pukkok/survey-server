@@ -16,21 +16,19 @@ const corsOptions = {
     origin: '*',
     credentials: true
 }
-
 app.use(cors(corsOptions))
+
+/** 필수!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11 */
+app.use(express.json()) // 파싱
+/** 필수!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11 */
+
 
 app.get('/', (req, res, next) => {
     res.json({code: 200, msg: '서버 동작 확인'})
 })
 
-app.get('/user', expressAsyncHandler( async (req, res, next) => {
-    const user = await User.findOne({name: '서민석'})
-    if(user){
-        res.json({code: 200, msg: user})
-    }else{
-        res.json({code: 400, msg: '파일 전송 실패'})
-    }
-}))
+const userRouter = require('../src/routes/user')
+app.use('/user', userRouter)
 
 app.listen(port, () => {
     console.log(`${port}번 연결`)
