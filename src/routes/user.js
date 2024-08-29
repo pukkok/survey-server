@@ -7,6 +7,7 @@ const { generateToken, isAdmin, isAuth } = require('../../auth')
 
 const router = express.Router()
 
+// 회원가입
 router.post('/join', [
     validateUserId(),
     validateUserPassword(),
@@ -22,21 +23,46 @@ expressAsyncHandler( async(req, res, next) => {
             err: errs.array()
         })
     }else{
-        const {name, email, phone, userId, password} = req.body
-
-        const user = new User({
-            name, email, phone, userId, password
-        })
-    
-        const success = await user.save()
-        if(success){
-            res.json({code: 200, msg: '회원가입 완료'})
+        const dupUser = await User.findOne({userId : req.body.userId})
+        if(dupUser){
+            return res.json({code: 401, msg: '이미 존재하는 아이디입니다.'})
         }else{
-            res.json({code: 401, msg: '회원가입 실패'})
+            const {name, email, phone, userId, password} = req.body
+    
+            const user = new User({
+                name, email, phone, userId, password
+            })
+        
+            const success = await user.save()
+            if(success){
+                res.json({code: 200, msg: '회원가입 완료'})
+            }else{
+                res.json({code: 401, msg: '회원가입 실패'})
+            }
         }
     }
 }))
 
+// 아이디 중복확인 처리
+router.post('/join/id-check', validateUserId(), expressAsyncHandler( async(req, res, next) => {
+    const errs = validationResult(req)
+    if(!errs.isEmpty()){
+        res.json({
+            code: 400,
+            msg: errs.array()[0].msg,
+            err: errs.array()
+        })
+    }else{
+        const user = await User.findOne({userId : req.body.userId})
+        if(user){
+            res.json({code: 401, msg: '이미 존재하는 아이디입니다.'})
+        }else{
+            res.json({code: 200, msg: '사용 가능한 아이디입니다.'})
+        }
+    }
+}))
+
+// 로그인
 router.post('/login',
 expressAsyncHandler( async(req, res, next) => {
     const loginUser = await User.findOne({
