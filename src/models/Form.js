@@ -12,16 +12,19 @@ const FormShcema = new Schema({
         type: ObjectId,
         ref: 'User'
     }],
-    title : {
-        type : String,
+    url:{
+        type: String,
         required: true,
     },
+    title : {
+        type : String
+    },
     pages : {
-        type : Object,
+        type : Object
     },
     createdAt : {
         type: Date,
-        default : dayjs()
+        default: dayjs()
     },
     lastModifiedAt : {
         type: Date,
