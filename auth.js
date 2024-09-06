@@ -1,4 +1,4 @@
-const dotenv = require('./dotenv')
+const config = require('./config')
 const jwt = require('jsonwebtoken')
 
 const generateToken = (user) => {
@@ -8,7 +8,7 @@ const generateToken = (user) => {
         userId: user.userId,
         createdAt: user.createdAt,
     },
-    dotenv.JWT_SECRET, // 비밀키
+    config.JWT_SECRET, // 비밀키
     {
         expiresIn: '3h', // 토큰 만료 시간
         issuer: '푹곡좌'
@@ -22,7 +22,7 @@ const isAuth = (req, res, next) => {
         return res.status(401).json({ code: 401, msg: '토큰이 없습니다.'})
     }else{
         const token = bearerToken.slice(7, bearerToken.length)
-        jwt.verify(token, dotenv.JWT_SECRET, (err, userInfo) => {
+        jwt.verify(token, config.JWT_SECRET, (err, userInfo) => {
             if(err && err.name === 'TokenExpiredError'){
                 return res.status(419).json({code: 419, msg: '토큰이 만료되었습니다.'})
             }else if(err){
