@@ -6,7 +6,7 @@ const expressAsyncHandler = require('express-async-handler')
 
 const mongoose = require('mongoose')
 const config = require('../config')
-mongoose.connect(config.MONGO_URI)
+mongoose.connect(config.MONGODB_URI)
 .then(()=> console.log('데이터베이스 연결 완료'))
 .catch((err) => console.log(`데이터베이스 연결 실패 : ${err}`))
 
