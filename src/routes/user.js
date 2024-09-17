@@ -76,9 +76,8 @@ expressAsyncHandler( async(req, res, next) => {
         const { name, email, userId, createdAt } = loginUser
         res.json({
             code: 200,
-            token: generateToken(loginUser),
             msg: '로그인 완료',
-            data : {name, email, userId, createdAt}
+            data : {name, email, userId, createdAt, token: generateToken(loginUser)}
         })
     }
 })

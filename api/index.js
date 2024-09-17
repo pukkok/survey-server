@@ -4,6 +4,9 @@ const port = 5000
 
 const expressAsyncHandler = require('express-async-handler')
 
+const userRouter = require('../src/routes/user')
+const formRouter = require('../src/routes/form')
+
 const mongoose = require('mongoose')
 const config = require('../config')
 mongoose.connect(config.MONGODB_URI)
@@ -26,8 +29,10 @@ app.use(logger('tiny'))
 app.use(express.json()) // 파싱
 /** 필수!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11 */
 
-const userRouter = require('../src/routes/user')
+
 app.use('/user', userRouter)
+
+app.use('/form', formRouter)
 
 app.get('/', (req, res, next) => {
     res.json({code: 200, msg: '서버 동작 확인'})
@@ -41,7 +46,6 @@ app.use((err, req, res, next) => {
     console.log(err.stack)
     res.status(500).json({ code: 500, msg: '서버 에러 발생'})
 })
-
 
 app.listen(port, () => {
     console.log(`${port}번 연결`)

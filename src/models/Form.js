@@ -15,12 +15,17 @@ const FormShcema = new Schema({
     url:{
         type: String,
         required: true,
+        unique: true,
     },
     title : {
         type : String
     },
     pages : {
         type : Object
+    },
+    isPublic : { // 공개 여부
+        type : Boolean,
+        default : false
     },
     createdAt : {
         type: Date,
