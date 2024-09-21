@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose
 const {Types : { ObjectId }} = Schema
 
-const FormShcema = new Schema({
+const FormSchema = new Schema({
     author : {
         type: String,
         required: true
@@ -42,6 +42,6 @@ const FormShcema = new Schema({
 // 페이지
 // 퀴즈 배열
 
-const Form = mongoose.model('Form', FormShcema)
+const Form = mongoose.model('Form', FormSchema)
 module.exports = Form
 
