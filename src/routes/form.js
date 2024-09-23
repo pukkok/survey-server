@@ -52,7 +52,16 @@ router.post('/create', isAuth, expressAsyncHandler( async(req, res, next) => {
 
 }))
 
-router.get('/download', expressAsyncHandler( async(req, res, next) => {
+router.post('/my-form/load', isAuth, expressAsyncHandler( async (req, res, next) => {
+    const forms = await Form.find({ author : req.user.name })
+    if(forms){
+        res.json({code: 200, msg: '설문지 전송', forms})
+    }else{
+        res.json({code: 404, msg: '설문지를 찾을수 없어요'})
+    }
+}))
+
+router.get('/form', expressAsyncHandler( async(req, res, next) => {
     
 }))
 

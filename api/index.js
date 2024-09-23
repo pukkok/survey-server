@@ -2,10 +2,10 @@ const express = require('express')
 const app = express()
 const port = 5000
 
-const expressAsyncHandler = require('express-async-handler')
-
 const userRouter = require('../src/routes/user')
 const formRouter = require('../src/routes/form')
+
+const { isAuth } = require('../auth')
 
 const mongoose = require('mongoose')
 const config = require('../config')
@@ -24,11 +24,14 @@ app.use(cors(corsOptions))
 
 //로그 설정
 const logger = require('morgan')
+
 app.use(logger('tiny'))
 /** 필수!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11 */
 app.use(express.json()) // 파싱
 /** 필수!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11 */
-
+app.use('/auth', isAuth, (req, res, next) => {
+    if(req.user) res.json({code: 200, msg: '토큰 있음'})
+})
 
 app.use('/user', userRouter)
 

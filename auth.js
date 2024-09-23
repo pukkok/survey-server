@@ -24,9 +24,9 @@ const isAuth = (req, res, next) => {
         const token = bearerToken.slice(7, bearerToken.length)
         jwt.verify(token, config.JWT_SECRET, (err, userInfo) => {
             if(err && err.name === 'TokenExpiredError'){
-                return res.status(419).json({code: 419, msg: '토큰이 만료되었습니다.'})
+                return res.status(419).json({code: 419, msg: '토큰이 만료되었습니다.', errName : 'TokenExpiredError'})
             }else if(err){
-                return res.status(401).json({code: 401, msg: '유효한 토큰이 아닙니다.'})
+                return res.status(401).json({code: 401, msg: '토큰이 없습니다.'})
             }
             req.user = userInfo
             next()
