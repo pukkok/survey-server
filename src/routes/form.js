@@ -4,6 +4,7 @@ const Form = require('../models/Form')
 const expressAsyncHandler = require('express-async-handler')
 const { isAuth } = require('../../auth')
 const Question = require('../models/Question')
+const dayjs = require('dayjs')
 
 const router = express.Router()
 
@@ -31,25 +32,46 @@ async function urlChecker (url) {
     }
 }
 
+// 설문지 생성
 router.post('/create', isAuth, expressAsyncHandler( async(req, res, next) => {
-    // const urlCheck = await Form.findOne({url: req.body.url})
     let url = req.body.url
     url = await urlChecker(url)
     if(url){
         const {title, pages} = req.body
 
         const form = new Form({
-            author: req.user.name, url, title, pages
+            author: req.user.name, url, title, pages, endingMent:[]
         })
     
         const success = await form.save()
         if(success){
-            res.json({code: 200, msg: '설문지 저장 완료'})
+            res.json({code: 200, msg: '설문지 생성 완료'})
         }else{
             res.json({code: 401, msg: '설문지 생성 실패'})
         }
     }
+}))
 
+// 설문지 편집데이터 저장
+router.post('/edit', isAuth, expressAsyncHandler( async(req, res, next) => {
+    const {url, title, pages, endingMent} = req.body
+
+    const form = await Form.findOne({author: req.user.name, url})
+    if(form){
+        form.pages = [...pages]
+        form.title = title
+        form.endingMent = {...endingMent}
+        form.lastModifiedAt = dayjs()
+
+        const success = await form.save()
+        if(success){
+            res.json({code: 200, msg: '업데이트 성공'})
+        }else{
+            res.json({code: 400, msg: '업데이트 실패'})
+        }
+    }else{
+        res.json({code: 400, msg: '유효한 설문지가 아닙니다.'})
+    }
 }))
 
 router.post('/my-form/load', isAuth, expressAsyncHandler( async (req, res, next) => {
@@ -61,9 +83,46 @@ router.post('/my-form/load', isAuth, expressAsyncHandler( async (req, res, next)
     }
 }))
 
-router.get('/form', expressAsyncHandler( async(req, res, next) => {
+router.post('/my-form/copy', isAuth, expressAsyncHandler( async (req, res, next) => {
+    const form = await Form.findOne({ author : req.user.name, url : req.body.url })
+    let url = randomUrl(10)
+    url = await urlChecker(url)
+
+    if(form){
+        const {author, coWorkers, title, pages, endingMent, isPublic} = form
+        const copyForm = new Form({
+            author, coWorkers, title : title+'(사본)', pages, endingMent, isPublic, 
+            url, createdAt : dayjs(), lastModifiedAt: dayjs()
+        })
+        
+        const success = await copyForm.save()
+        if(success){
+            res.json({code: 200, msg: '설문지 복사 성공'})
+        }else{
+            res.json({code: 400, msg: '설문지 복사 실패'})
+        }
+    }else{
+        res.json({code: 404, msg: '복사할 설문지를 찾을 수 없어요'})
+    }
+
+}))
+
+router.post('/my-form/delete', isAuth, expressAsyncHandler( async (req, res, next) => {
+    const form = await Form.findOneAndDelete({ author : req.user.name, url : req.body.url })
+    if(form){
+        res.json({code: 200, msg: '설문지 삭제 완료'})
+    }else{
+        res.json({code: 400, msg: '설문지 삭제 실패'})
+    }
+
+}))
+
+router.get('/all-forms', expressAsyncHandler( async(req, res, next) => {
     
 }))
+
+
+
 
 router.post('/question/save', isAuth, expressAsyncHandler( async(req, res, next) => {
     const {id, q, description, type, options, hasExtraOption} = req.body

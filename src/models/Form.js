@@ -23,6 +23,9 @@ const FormSchema = new Schema({
     pages : {
         type : Object
     },
+    endingMent : {
+        type : Object
+    },
     isPublic : { // 공개 여부
         type : Boolean,
         default : false
