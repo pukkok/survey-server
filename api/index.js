@@ -17,7 +17,7 @@ const User = require('../src/models/User')
 // cors설정
 const cors = require('cors')
 const corsOptions = {
-    origin: ['https://pukkok.github.com/whale-form', 'http://localhost:3000'],
+    origin: ['https://pukkok.github.io/whale-form', 'http://localhost:3000'],
     credentials: true
 }
 app.use(cors(corsOptions))
