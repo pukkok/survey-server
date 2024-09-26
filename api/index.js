@@ -20,7 +20,7 @@ const corsOptions = {
     origin: ['https://pukkok.github.io', 'http://localhost:3000'],
     credentials: true
 }
-app.options('*', cors(corsOptions))
+app.use('*', cors(corsOptions))
 
 //로그 설정
 const logger = require('morgan')
