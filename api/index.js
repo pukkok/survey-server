@@ -20,7 +20,7 @@ const corsOptions = {
     origin: ['https://pukkok.github.io/whale-form', 'http://localhost:3000'],
     credentials: true
 }
-app.use(cors(corsOptions))
+app.options('*', cors(corsOptions))
 
 //로그 설정
 const logger = require('morgan')
