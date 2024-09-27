@@ -17,7 +17,7 @@ const User = require('../src/models/User')
 // cors설정
 const cors = require('cors')
 const corsOptions = {
-    origin: ['https://pukkok.github.io', 'http://localhost:3000'],
+    origin: [config.CLIENT, 'http://localhost:3000'],
     credentials: true
 }
 app.use('*', cors(corsOptions))
