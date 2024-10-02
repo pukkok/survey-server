@@ -33,6 +33,24 @@ app.use('/auth', isAuth, (req, res, next) => {
     if(req.user) res.json({code: 200, msg: '토큰 있음'})
 })
 
+app.post('/refresh-token', isAuth, (req, res, next) => {
+    try {
+        const userInfo = req.user;
+
+        // 사용자 정보로 새 토큰 발급
+        const newToken = generateToken({
+            _id: userInfo._id,
+            name: userInfo.name,
+            userId: userInfo.userId,
+            createdAt: userInfo.createdAt
+        })
+
+        return res.status(200).json({ token: newToken })
+    } catch (err) {
+        return res.status(500).json({ msg: "토큰 갱신 중 오류가 발생했습니다.", error: err.message })
+    }
+})
+
 app.use('/user', userRouter)
 
 app.use('/form', formRouter)
