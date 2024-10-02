@@ -5,7 +5,7 @@ const port = 5000
 const userRouter = require('../src/routes/user')
 const formRouter = require('../src/routes/form')
 
-const { isAuth } = require('../auth')
+const { isAuth, generateToken } = require('../auth')
 
 const mongoose = require('mongoose')
 const config = require('../config')
@@ -29,21 +29,16 @@ app.use(logger('tiny'))
 /** 필수!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11 */
 app.use(express.json()) // 파싱
 /** 필수!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11 */
-app.use('/auth', isAuth, (req, res, next) => {
+app.post('/auth', isAuth, (req, res, next) => {
     if(req.user) res.json({code: 200, msg: '토큰 있음'})
 })
 
 app.post('/refresh-token', isAuth, (req, res, next) => {
     try {
-        const userInfo = req.user;
+        const userInfo = req.user
 
         // 사용자 정보로 새 토큰 발급
-        const newToken = generateToken({
-            _id: userInfo._id,
-            name: userInfo.name,
-            userId: userInfo.userId,
-            createdAt: userInfo.createdAt
-        })
+        const newToken = generateToken(userInfo)
 
         return res.status(200).json({ token: newToken })
     } catch (err) {
