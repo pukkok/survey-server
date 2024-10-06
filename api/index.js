@@ -4,7 +4,7 @@ const port = 5000
 
 const userRouter = require('../src/routes/user')
 const formRouter = require('../src/routes/form')
-
+const OTPRouter = require('../src/routes/emailOTP')
 const { isAuth, generateToken } = require('../auth')
 
 const mongoose = require('mongoose')
@@ -49,6 +49,8 @@ app.post('/refresh-token', isAuth, (req, res, next) => {
 app.use('/user', userRouter)
 
 app.use('/form', formRouter)
+
+app.use('/confirm', OTPRouter)
 
 app.get('/', (req, res, next) => {
     res.json({code: 200, msg: '서버 동작 확인'})
