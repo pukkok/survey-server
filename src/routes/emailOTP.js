@@ -41,8 +41,21 @@ router.post('/send-otp', expressAsyncHandler( async (req, res, next) => {
         await transporter.sendMail({
             from: `"Form OTP" <${config.EMAIL_ID}>`,
             to : email,
-            subject : 'FormTok OTP Code',
-            text : `OTP 코드: ${otp}`
+            subject : 'FormTok 인증 코드입니다.',
+            html: `
+            <div style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; color: #333;">
+                <h2 style="color: #7E37ED;">FormTok OTP 인증</h2>
+                <p style="font-size: 16px;">안녕하세요,</p>
+                <p style="font-size: 16px;">FormTok 서비스의 본인 인증을 위해 아래의 OTP 코드를 입력해 주세요.</p>
+                <div style="text-align: center; padding: 20px; background-color: white; border-radius: 8px;">
+                    <span style="font-size: 24px; font-weight: bold; color: #7E37ED;">${otp}</span>
+                </div>
+                <p style="font-size: 14px; color: #999; margin-top: 20px;">
+                    이 코드는 5분간 유효합니다. 만약 본인이 요청하지 않은 경우, 해당 이메일로 회신 부탁드립니다.
+                </p>
+                <p style="font-size: 16px;">감사합니다,<br/>FormTok</p>
+            </div>
+        `
         })
 
         res.json({ code: 200, msg: 'OTP 전송 성공'})
@@ -58,24 +71,24 @@ router.post('/verify-otp', (req, res) => {
   
     // OTP 유효성 검사
     if (!otpStore[email]) {
-      return res.status(400).json({ message: 'Invalid email' });
+      return res.json({ code: 400, msg: '유효하지 않은 이메일 입니다.' })
     }
   
-    const { otp: storedOtp, expiresIn } = otpStore[email];
+    const { otp: storedOtp, expiresIn } = otpStore[email]
   
     // OTP 만료 확인
     if (dayjs() > expiresIn) {
-      delete otpStore[email]; // 만료된 OTP 삭제
-      return res.status(400).json({ message: 'OTP has expired' });
+      delete otpStore[email] // 만료된 OTP 삭제
+      return res.json({ code: 400, msg: '기간이 만료되었습니다.' })
     }
   
     // OTP 일치 확인
     if (storedOtp === Number(otp)) {
       delete otpStore[email] // 성공 시 OTP 삭제
-      return res.status(200).json({ message: '유효한 OTP 입니다.' });
+      return res.json({ code: 200, msg: '유효한 OTP 입니다.' })
     }
   
-    return res.status(400).json({ message: 'Invalid OTP' });
+    return res.json({ code: 400, msg: '유효하지 않은 OTP 입니다.' })
   })
   
   module.exports = router
