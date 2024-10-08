@@ -37,10 +37,11 @@ router.post('/create', isAuth, expressAsyncHandler( async(req, res, next) => {
     let url = req.body.url
     url = await urlChecker(url)
     if(url){
-        const {title, pages} = req.body
+        const {title, pages, listStyle, options} = req.body
 
         const form = new Form({
-            author: req.user.name, url, title, pages, endingMent:[]
+            author: req.user.name, url, title, pages, endingMent:[],
+            listStyle, options
         })
     
         const success = await form.save()
@@ -54,7 +55,7 @@ router.post('/create', isAuth, expressAsyncHandler( async(req, res, next) => {
 
 // 설문지 편집데이터 저장
 router.post('/edit', isAuth, expressAsyncHandler( async(req, res, next) => {
-    const {url, title, pages, endingMent} = req.body
+    const {url, title, pages, endingMent, listStyle, options} = req.body
 
     const form = await Form.findOne({author: req.user.name, url})
     if(form){
@@ -62,7 +63,8 @@ router.post('/edit', isAuth, expressAsyncHandler( async(req, res, next) => {
         form.title = title
         form.endingMent = {...endingMent}
         form.lastModifiedAt = dayjs()
-
+        form.listStyle = listStyle
+        form.options = options
         const success = await form.save()
         if(success){
             res.json({code: 200, msg: '업데이트 성공'})

@@ -26,9 +26,11 @@ const FormSchema = new Schema({
     endingMent : {
         type : Object
     },
-    isPublic : { // 공개 여부
-        type : Boolean,
-        default : false
+    listStyle: {
+        type : String
+    },
+    options : {
+        type : Object
     },
     createdAt : {
         type: Date,
