@@ -4,8 +4,8 @@ const { Schema } = mongoose
 const {Types : { ObjectId }} = Schema
 
 const AnswerSchema = new Schema({
-    author : {
-        
+    user : {
+        type : String,
     },
     url : {
         type: String,

@@ -5,6 +5,7 @@ const port = 5000
 const userRouter = require('../src/routes/user')
 const formRouter = require('../src/routes/form')
 const OTPRouter = require('../src/routes/emailOTP')
+const answerRouter = require('../src/routes/answer')
 const { isAuth, generateToken } = require('../auth')
 
 const mongoose = require('mongoose')
@@ -13,7 +14,6 @@ mongoose.connect(config.MONGODB_URI)
 .then(()=> console.log('데이터베이스 연결 완료'))
 .catch((err) => console.log(`데이터베이스 연결 실패 : ${err}`))
 
-const User = require('../src/models/User')
 // cors설정
 const cors = require('cors')
 const corsOptions = {
@@ -46,11 +46,13 @@ app.post('/refresh-token', isAuth, (req, res, next) => {
     }
 })
 
-app.use('/user', userRouter)
+app.use('/user', userRouter) // 유저
 
-app.use('/form', formRouter)
+app.use('/form', formRouter) // 설문지 제작 및 관리
 
-app.use('/confirm', OTPRouter)
+app.use('/confirm', OTPRouter) // 인증
+
+app.use('/answer', answerRouter) // 답변 제출
 
 app.get('/', (req, res, next) => {
     res.json({code: 200, msg: '서버 동작 확인'})

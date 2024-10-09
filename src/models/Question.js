@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose
 const {Types : { ObjectId }} = Schema
 
+// 내 질문들
 const QuestionSchema = new Schema({
     author : {
         type: String,

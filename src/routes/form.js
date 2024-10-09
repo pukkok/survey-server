@@ -120,9 +120,8 @@ router.post('/my-form/delete', isAuth, expressAsyncHandler( async (req, res, nex
 }))
 
 router.get('/all-forms', expressAsyncHandler( async(req, res, next) => {
-    const forms = await Form.find({})
+    const forms = await Form.find({'options.isPublic' : true, 'options.isOpen': true})
     if(forms){
-        
         res.json({code: 200, msg: '설문지 전체 전송 성공', forms})
     }else{
         res.json({code: 400, msg: '설문지 전체 전송 실패'})

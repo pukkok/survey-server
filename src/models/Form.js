@@ -39,6 +39,11 @@ const FormSchema = new Schema({
     lastModifiedAt : {
         type: Date,
         default: dayjs()
+    },
+    numberOfResponses : {
+        type: Number,
+        default: 0,
+        ref: 'Answer'
     }
 })
 
