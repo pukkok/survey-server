@@ -20,6 +20,7 @@ const hasToken = (req, res, next) => {
     const bearerToken = req.headers.authorization
     const token = bearerToken.slice(7, bearerToken.length)
     if(!token){
+        req.user = null
         return next() // 비회원 처리
     }else{
         jwt.verify(token, config.JWT_SECRET, (err, userInfo) => {

@@ -11,7 +11,7 @@ router.post('/submit', hasToken, expressAsyncHandler( async(req, res, next) => {
     const { url } = req.query
     const { answer } = req.body
     const userInfo = req.user
-    const userId = userInfo.userId || '비회원'
+    const userId = userInfo?.userId || '비회원'
 
     const form = await Form.findOne({ url })
 
@@ -19,7 +19,7 @@ router.post('/submit', hasToken, expressAsyncHandler( async(req, res, next) => {
         return res.json({ code: 404, msg: '설문지를 찾을 수 없습니다.' })
     }
 
-    if(userInfo){
+    if(userId !== '비회원'){
         const alreadySubmitted = await Answer.findOne({ url, userId })
 
         if(alreadySubmitted){
