@@ -40,17 +40,11 @@ const FormSchema = new Schema({
         type: Date,
         default: dayjs()
     },
-    numberOfResponses : {
-        type: Number,
-        default: 0,
+    numberOfResponses : [{
+        type: ObjectId,
         ref: 'Answer'
-    }
+    }]
 })
-
-// 설문조사시 
-// 설문지 제목
-// 페이지
-// 퀴즈 배열
 
 const Form = mongoose.model('Form', FormSchema)
 module.exports = Form

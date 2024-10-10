@@ -1,8 +1,9 @@
 const express = require('express')
 const User = require('../models/User')
 const Form = require('../models/Form')
+const Answer = require('../models/Answer')
 const expressAsyncHandler = require('express-async-handler')
-const { isAuth } = require('../../auth')
+const { isAuth, verifyToken, hasToken } = require('../../auth')
 const Question = require('../models/Question')
 const dayjs = require('dayjs')
 
@@ -76,6 +77,7 @@ router.post('/edit', isAuth, expressAsyncHandler( async(req, res, next) => {
     }
 }))
 
+// 내 설문지 불러오기
 router.post('/my-form/load', isAuth, expressAsyncHandler( async (req, res, next) => {
     const forms = await Form.find({ author : req.user.name })
     if(forms){
@@ -85,6 +87,7 @@ router.post('/my-form/load', isAuth, expressAsyncHandler( async (req, res, next)
     }
 }))
 
+// 설문지 복사
 router.post('/my-form/copy', isAuth, expressAsyncHandler( async (req, res, next) => {
     const form = await Form.findOne({ author : req.user.name, url : req.body.url })
     let url = randomUrl(10)
@@ -109,6 +112,7 @@ router.post('/my-form/copy', isAuth, expressAsyncHandler( async (req, res, next)
 
 }))
 
+// 내 설문지 삭제
 router.post('/my-form/delete', isAuth, expressAsyncHandler( async (req, res, next) => {
     const form = await Form.findOneAndDelete({ author : req.user.name, url : req.body.url })
     if(form){
@@ -119,7 +123,10 @@ router.post('/my-form/delete', isAuth, expressAsyncHandler( async (req, res, nex
 
 }))
 
+
+// 공개된 전체 설문지 불러오기
 router.get('/all-forms', expressAsyncHandler( async(req, res, next) => {
+    // 공개 설정, 게시 체크
     const forms = await Form.find({'options.isPublic' : true, 'options.isOpen': true})
     if(forms){
         res.json({code: 200, msg: '설문지 전체 전송 성공', forms})
@@ -128,8 +135,52 @@ router.get('/all-forms', expressAsyncHandler( async(req, res, next) => {
     }
 }))
 
+router.post('/submit-form', hasToken, expressAsyncHandler( async(req, res, next) => {
+    const { url } = req.query // 쿼리 파라미터에서 url 값 추출
+    const userInfo = req.user
 
+    if (!url) {
+        return res.json({ code: 400, msg: 'URL 쿼리 파라미터가 필요합니다.' })
+    }
 
+    const form = await Form.findOne({ url })
+
+    if (!form) {
+        return res.json({ code: 404, msg: '설문지를 찾을 수 없습니다.' })
+    }
+
+    if(form.options?.isNeedLogin){ // 로그인 필수인 경우
+        if(!userInfo) return res.json({code: 401, msg: '로그인 후 이용 가능합니다.'})
+    }
+    
+    if(userInfo){
+        const alreadySubmitted = await Answer.findOne({ url, userId: userInfo.userId })
+    
+        if(alreadySubmitted){ // 설문지 수정 가능?
+            if(!form.options.isAllowModify){
+                return res.json({code: 401, msg: '이미 제출된 설문지 입니다.(수정이 불가능 합니다.)'})
+            }else{
+                return res.json({code: 200, msg: '설문지 전송 완료', form, submittedAnswer : alreadySubmitted.answer})
+            }
+        }
+    }
+
+    // 인원 체크
+    const maxCount = form.options?.maximumCount || 10000
+    if (form.numberOfResponses.length >= maxCount) {
+        return res.json({ code: 401, msg: '참여인원을 초과하였습니다.' })
+    }
+    const {startDate, endDate} = form.options
+    if(startDate && dayjs(startDate).isAfter(dayjs())){
+        return res.json({ code: 401, msg: '참여할 수 있는 기간이 아닙니다.'})
+    }
+    if(endDate && dayjs(endDate).isBefore(dayjs())){
+        return res.json({ code: 401, msg: '종료된 설문지입니다.'})
+    }
+
+    return res.json({ code: 200, msg: '설문지 전송 완료', form })
+    
+}))
 
 router.post('/question/save', isAuth, expressAsyncHandler( async(req, res, next) => {
     const {id, q, description, type, options, hasExtraOption, } = req.body
