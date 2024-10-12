@@ -73,7 +73,19 @@ router.post('/edit', isAuth, expressAsyncHandler( async(req, res, next) => {
             res.json({code: 400, msg: '업데이트 실패'})
         }
     }else{
-        res.json({code: 400, msg: '유효한 설문지가 아닙니다.'})
+        // 비로그인에서 생성후 로그인 후 저장하는 경우
+        const newForm = new Form({
+            author: req.user.name, url, title, pages, endingMent:[],
+            listStyle, options
+        })
+
+        const success = await newForm.save()
+        if(success){
+            res.json({code: 200, msg: '새로운 설문지가 생성되었습니다.'})
+        }else{
+            res.json({code: 400, msg: '유효한 설문지가 아닙니다.'})
+        }
+
     }
 }))
 
@@ -153,29 +165,34 @@ router.post('/submit-form', hasToken, expressAsyncHandler( async(req, res, next)
         if(!userInfo) return res.json({code: 401, msg: '로그인 후 이용 가능합니다.'})
     }
     
+    if(form.options?.isEnd){
+        return res.json({code: 403, msg: '종료된 설문지 입니다.'})
+    }
+
     if(userInfo){
         const alreadySubmitted = await Answer.findOne({ url, userId: userInfo.userId })
     
         if(alreadySubmitted){ // 설문지 수정 가능?
             if(!form.options.isAllowModify){
-                return res.json({code: 401, msg: '이미 제출된 설문지 입니다.(수정이 불가능 합니다.)'})
+                return res.json({code: 403, msg: '이미 제출된 설문지 입니다.\n(수정이 불가능한 설문지 입니다.)'})
             }else{
                 return res.json({code: 200, msg: '설문지 전송 완료', form, submittedAnswer : alreadySubmitted.answer})
             }
         }
     }
 
+    const {startDate, endDate} = form.options
+    if(startDate && dayjs(startDate).isAfter(dayjs())){
+        return res.json({ code: 403, msg: '참여할 수 있는 기간이 아닙니다.'})
+    }
+    if(endDate && dayjs(endDate).isBefore(dayjs())){
+        return res.json({ code: 403, msg: '종료된 설문지입니다.'})
+    }
+    
     // 인원 체크
     const maxCount = form.options?.maximumCount || 10000
     if (form.numberOfResponses.length >= maxCount) {
-        return res.json({ code: 401, msg: '참여인원을 초과하였습니다.' })
-    }
-    const {startDate, endDate} = form.options
-    if(startDate && dayjs(startDate).isAfter(dayjs())){
-        return res.json({ code: 401, msg: '참여할 수 있는 기간이 아닙니다.'})
-    }
-    if(endDate && dayjs(endDate).isBefore(dayjs())){
-        return res.json({ code: 401, msg: '종료된 설문지입니다.'})
+        return res.json({ code: 403, msg: '참여인원을 초과하였습니다.' })
     }
 
     return res.json({ code: 200, msg: '설문지 전송 완료', form })
