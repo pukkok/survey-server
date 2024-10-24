@@ -9,7 +9,7 @@ const router = express.Router()
 
 router.post('/submit', hasToken, expressAsyncHandler( async(req, res, next) => {
     const { url } = req.query
-    const { answer } = req.body
+    const { answers } = req.body
     const userInfo = req.user
     const userId = userInfo?.userId || '비회원'
 
@@ -23,7 +23,7 @@ router.post('/submit', hasToken, expressAsyncHandler( async(req, res, next) => {
         const alreadySubmitted = await Answer.findOne({ url, userId })
 
         if(alreadySubmitted){
-            alreadySubmitted.answer = {...answer}
+            alreadySubmitted.answers = {...answers}
             alreadySubmitted.lastModifiedAt = dayjs()
 
             const success = await alreadySubmitted.save()
@@ -38,13 +38,13 @@ router.post('/submit', hasToken, expressAsyncHandler( async(req, res, next) => {
     // 인원 체크
     const maxCount = form.options?.maximumCount || 10000
     if (form.numberOfResponses.length > maxCount) {
-        return res.json({ code: 401, msg: '참여인원을 초과하였습니다.' })
+        return res.json({ code: 403, msg: '참여인원을 초과하였습니다.' })
     }
 
     const newAnswer = new Answer({
         userId,
         url,
-        answer,
+        answers,
         dateOfParticipation: dayjs()
     })
     const success = await newAnswer.save()
@@ -54,7 +54,18 @@ router.post('/submit', hasToken, expressAsyncHandler( async(req, res, next) => {
 
         res.json({code: 200, msg: '답변이 제출되었습니다.'})
     }else{
-        res.json({code: 401, msg: '답변 제출에 실패했습니다.'})
+        res.json({code: 403, msg: '답변 제출에 실패했습니다.'})
+    }
+}))
+
+router.get('/form-result', expressAsyncHandler( async(req, res, next) => {
+    const { url } = req.query
+
+    const answers = await Answer.find({ url })
+    if(answers){
+        return res.json({ code: 200, msg: '설문지 데이터 전송 성공', list: answers })
+    }else{
+        return res.json({ code: 400, msg: '응답된 설문이 없습니다.'})
     }
 }))
 

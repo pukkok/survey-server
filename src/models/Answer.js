@@ -1,7 +1,6 @@
 const dayjs = require('dayjs')
 const mongoose = require('mongoose')
 const { Schema } = mongoose
-const { Types : { ObjectId } } = Schema
 
 const AnswerSchema = new Schema({
     userId : {
@@ -10,7 +9,7 @@ const AnswerSchema = new Schema({
     url : {
         type: String,
     },
-    answer : {
+    answers : {
         type : Object
     },
     dateOfParticipation : {
