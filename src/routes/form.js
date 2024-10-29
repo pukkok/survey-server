@@ -152,21 +152,21 @@ router.post('/submit-form', hasToken, expressAsyncHandler( async(req, res, next)
     const userInfo = req.user
 
     if (!url) {
-        return res.json({ code: 400, msg: 'URL 쿼리 파라미터가 필요합니다.' })
+        return res.status(400).json({ code: 400, msg: 'URL 쿼리 파라미터가 필요합니다.' })
     }
 
     const form = await Form.findOne({ url })
 
     if (!form) {
-        return res.json({ code: 404, msg: '설문지를 찾을 수 없습니다.' })
+        return res.status(404).json({ code: 404, msg: '설문지를 찾을 수 없습니다.' })
     }
 
     if(form.options?.isNeedLogin){ // 로그인 필수인 경우
-        if(!userInfo) return res.json({code: 401, msg: '로그인 후 이용 가능합니다.'})
+        if(!userInfo) return res.status(401).json({code: 401, msg: '로그인 후 이용 가능합니다.'})
     }
     
     if(form.options?.isEnd){
-        return res.json({code: 403, msg: '종료된 설문지 입니다.'})
+        return res.status(403).json({code: 403, msg: '종료된 설문지 입니다.'})
     }
 
     if(userInfo){
@@ -174,28 +174,28 @@ router.post('/submit-form', hasToken, expressAsyncHandler( async(req, res, next)
     
         if(alreadySubmitted){ // 설문지 수정 가능?
             if(!form.options.isAllowModify){
-                return res.json({code: 403, msg: '이미 제출된 설문지 입니다.\n(수정이 불가능한 설문지 입니다.)'})
+                return res.status(403).json({code: 403, msg: '이미 제출된 설문지 입니다.\n(수정이 불가능한 설문지 입니다.)'})
             }else{
-                return res.json({code: 200, msg: '설문지 전송 완료', form, submittedAnswer : alreadySubmitted.answer})
+                return res.status(200).json({code: 200, msg: '설문지 전송 완료', form, submittedAnswer : alreadySubmitted.answers})
             }
         }
     }
 
     const {startDate, endDate} = form.options
     if(startDate && dayjs(startDate).isAfter(dayjs())){
-        return res.json({ code: 403, msg: '참여할 수 있는 기간이 아닙니다.'})
+        return res.status(403).json({ code: 403, msg: '참여할 수 있는 기간이 아닙니다.'})
     }
     if(endDate && dayjs(endDate).isBefore(dayjs())){
-        return res.json({ code: 403, msg: '종료된 설문지입니다.'})
+        return res.status(403).json({ code: 403, msg: '종료된 설문지입니다.'})
     }
     
     // 인원 체크
     const maxCount = form.options?.maximumCount || 10000
     if (form.numberOfResponses.length >= maxCount) {
-        return res.json({ code: 403, msg: '참여인원을 초과하였습니다.' })
+        return res.status(403).json({ code: 403, msg: '참여인원을 초과하였습니다.' })
     }
 
-    return res.json({ code: 200, msg: '설문지 전송 완료', form })
+    return res.status(200).json({ code: 200, msg: '설문지 전송 완료', form })
     
 }))
 
@@ -220,9 +220,9 @@ router.post('/question/load', isAuth, expressAsyncHandler( async(req, res, next)
     const questions = await Question.find({author : req.user.name})
 
     if(questions){
-        res.json({code: 200, msg: '질문 전송', questions})
+        res.status(200).json({code: 200, msg: '질문 전송', questions})
     }else{
-        res.json({code: 404, msg: '질문을 찾을 수 없어요.'})
+        res.status(404).json({code: 404, msg: '질문을 찾을 수 없어요.'})
     }
 }))
 
