@@ -1,3 +1,5 @@
+require('module-alias')
+
 const express = require('express')
 const app = express()
 
