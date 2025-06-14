@@ -3,7 +3,7 @@ const Answer = require('@/models/Answer')
 const Form = require('@/models/Form')
 const expressAsyncHandler = require('express-async-handler')
 const dayjs = require('dayjs')
-const { hasToken } = require('@/auth')
+const { hasToken } = require('../auth')
 
 const router = express.Router()
 

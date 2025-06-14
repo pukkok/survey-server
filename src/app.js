@@ -1,16 +1,14 @@
-require('module-alias')
-
 const express = require('express')
 const app = express()
 
-const userRouter = require('@/routes/user')
-const formRouter = require('@/routes/form')
-const OTPRouter = require('@/routes/emailOTP')
-const answerRouter = require('@/routes/answer')
-const { isAuth, generateToken } = require('@/auth')
+const userRouter = require('./routes/user')
+const formRouter = require('./routes/form')
+const OTPRouter = require('./routes/emailOTP')
+const answerRouter = require('./routes/answer')
+const { isAuth, generateToken } = require('./auth')
 
 const mongoose = require('mongoose')
-const config = require('@/config')
+const config = require('../config')
 
 mongoose.connect(config.MONGODB_URI)
 .then(()=> console.log('데이터베이스 연결 완료'))
