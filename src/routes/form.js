@@ -3,7 +3,7 @@ const User = require('../models/User')
 const Form = require('../models/Form')
 const Answer = require('../models/Answer')
 const expressAsyncHandler = require('express-async-handler')
-const { isAuth, verifyToken, hasToken } = require('../../auth')
+const { isAuth, hasToken } = require('../auth')
 const Question = require('../models/Question')
 const dayjs = require('dayjs')
 
@@ -106,10 +106,13 @@ router.post('/my-form/copy', isAuth, expressAsyncHandler( async (req, res, next)
     url = await urlChecker(url)
 
     if(form){
-        const {author, coWorkers, title, pages, endingMent, isPublic} = form
+        const {author, coWorkers, title, pages, endingMent, options} = form
         const copyForm = new Form({
-            author, coWorkers, title : title+'(사본)', pages, endingMent, isPublic, 
-            url, createdAt : dayjs(), lastModifiedAt: dayjs()
+            author, coWorkers, 
+            url, 
+            title : title+'(사본)', 
+            pages, endingMent, options,
+            createdAt : dayjs(), lastModifiedAt: dayjs()
         })
         
         const success = await copyForm.save()

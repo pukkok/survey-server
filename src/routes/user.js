@@ -1,9 +1,9 @@
 const express = require('express')
-const User = require('../models/User')
+const User = require('@/models/User')
 const expressAsyncHandler = require('express-async-handler')
-const { validateUserId, validateUserPassword, validateUserPhone, validateUserEmail } = require('../../validator')
+const { validateUserId, validateUserPassword, validateUserPhone, validateUserEmail } = require('../validator')
 const { validationResult } = require('express-validator')
-const { generateToken, isAdmin, isAuth } = require('../../auth')
+const { generateToken, isAdmin, isAuth } = require('../auth')
 
 const router = express.Router()
 
