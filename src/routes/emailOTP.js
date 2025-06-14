@@ -4,7 +4,7 @@ const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const expressAsyncHandler = require('express-async-handler')
 const dayjs = require('dayjs')
-const config = require('../config')
+const config = require('../../config')
 
 const router = express.Router()
 

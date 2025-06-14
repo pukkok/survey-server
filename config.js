@@ -1,6 +1,7 @@
 const dotenv = require('dotenv')
 
-dotenv.config({path : '.env'})
+dotenv.config({path : '../.env'}) // 배포용
+// dotenv.config({path : '.env'}) // 개발용
 
 module.exports = {
     MONGODB_URI : process.env.MONGODB_URI,
