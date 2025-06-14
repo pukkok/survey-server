@@ -1,4 +1,4 @@
-const app = require('../src/app') // ⬅ alias 대신 상대경로
+const app = require('../src/app')
 
 const PORT = 8080
 
