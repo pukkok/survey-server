@@ -106,9 +106,9 @@ router.post('/my-form/copy', isAuth, expressAsyncHandler( async (req, res, next)
     url = await urlChecker(url)
 
     if(form){
-        const {author, coWorkers, title, pages, endingMent, isPublic} = form
+        const {author, coWorkers, title, pages, endingMent, options, isPublic} = form
         const copyForm = new Form({
-            author, coWorkers, title : title+'(사본)', pages, endingMent, isPublic, 
+            author, coWorkers, title : title+'(사본)', pages, endingMent, isPublic, options,
             url, createdAt : dayjs(), lastModifiedAt: dayjs()
         })
         
