@@ -16,7 +16,7 @@ function randomUrl(n) {
     const upperCase = alphabets.toUpperCase().split('')
     const number = '0123456789'.split('')
     const merge = [...lowerCase, ...upperCase, ...number]
-    while(newUrl.length <= n){
+    while(newUrl.length < n){
         let rn = parseInt(Math.random() * merge.length)
         newUrl += merge[rn]
     }
@@ -97,6 +97,20 @@ router.post('/my-form/load', isAuth, expressAsyncHandler( async (req, res, next)
     }else{
         res.json({code: 404, msg: '설문지를 찾을수 없어요'})
     }
+}))
+
+// 설문지 단건 조회
+router.post('/my-form/one', isAuth, expressAsyncHandler(async (req, res) => {
+  const { url } = req.body
+  if (!url) return res.json({ code: 400, msg: 'url이 필요합니다.' })
+
+  const form = await Form.findOne({ author: req.user.name, url })
+
+  if (form) {
+    res.json({ code: 200, msg: '설문지 단건 전송', form })
+  } else {
+    res.json({ code: 404, msg: '해당 설문지를 찾을 수 없습니다.' })
+  }
 }))
 
 // 설문지 복사
