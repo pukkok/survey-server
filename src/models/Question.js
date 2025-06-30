@@ -21,7 +21,7 @@ const QuestionSchema = new Schema({
         type: String,
         required: true
     },
-    description: {
+    d: {
         type: String,
     },
     type : {
@@ -35,6 +35,27 @@ const QuestionSchema = new Schema({
     hasExtraOption: {
         type: Boolean,
         default: false
+    },
+    scoreRanges: {
+        type: Object,
+    },
+    tableRows: {
+        type: Array,
+    },
+    tableCols: {
+        type: Array,
+    },
+    hasDescription: {
+        type: Boolean,
+    },
+    period: {
+        type: Object,
+    },
+    setPeriod: {
+        type: Boolean,
+    },
+    essential: {
+        type: Boolean,
     },
     createdAt : {
         type: Date,

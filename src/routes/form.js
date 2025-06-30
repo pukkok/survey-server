@@ -214,10 +214,9 @@ router.post('/submit-form', hasToken, expressAsyncHandler( async(req, res, next)
 }))
 
 router.post('/question/save', isAuth, expressAsyncHandler( async(req, res, next) => {
-    const {id, q, description, type, options, hasExtraOption, } = req.body
 
     const question = new Question({
-        id, author: req.user.name, q, description, type, options, hasExtraOption
+        author: req.user.name, ...req.body
     })
 
     if(question){
