@@ -239,4 +239,30 @@ router.post('/question/load', isAuth, expressAsyncHandler( async(req, res, next)
     }
 }))
 
+router.post('/question/delete', isAuth, expressAsyncHandler( async(req, res, next) => {
+    const questions = await Question.findOneAndDelete({author : req.user.name, id: req.body.id })
+
+    if(questions){
+        res.status(200).json({code: 200, msg: '질문 삭제 완료', questions})
+    }else{
+        res.status(404).json({code: 404, msg: '질문을 찾을 수 없어요.'})
+    }
+}))
+
+router.post('/question/delete-multiple', isAuth, expressAsyncHandler(async (req, res, next) => {
+  const ids = req.body.ids
+
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ code: 400, msg: '삭제할 질문 ID 배열이 필요합니다.' })
+  }
+
+  const result = await Question.deleteMany({ author: req.user.name, id: { $in: ids } })
+
+  if (result.deletedCount > 0) {
+    res.status(200).json({ code: 200, msg: `${result.deletedCount}개의 질문 삭제 완료` })
+  } else {
+    res.status(404).json({ code: 404, msg: '삭제할 질문을 찾을 수 없어요.' })
+  }
+}))
+
 module.exports = router
