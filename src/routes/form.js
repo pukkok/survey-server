@@ -90,14 +90,24 @@ router.post('/edit', isAuth, expressAsyncHandler( async(req, res, next) => {
 }))
 
 // 내 설문지 불러오기
-router.post('/my-form/load', isAuth, expressAsyncHandler( async (req, res, next) => {
-    const forms = await Form.find({ author : req.user.name })
-    if(forms){
-        res.json({code: 200, msg: '설문지 전송', forms})
-    }else{
-        res.json({code: 404, msg: '설문지를 찾을수 없어요'})
-    }
+router.post('/my-form/load', isAuth, expressAsyncHandler(async (req, res) => {
+  const { filter } = req.body
+
+  const baseQuery = { author: req.user.name }
+
+  if (filter?.isOpen === true || filter?.isOpen === false) {
+    baseQuery['options.isOpen'] = filter.isOpen
+  }
+
+  const forms = await Form.find(baseQuery)
+
+  if (forms?.length) {
+    res.json({ code: 200, msg: '설문지 전송', forms })
+  } else {
+    res.json({ code: 404, msg: '설문지를 찾을 수 없어요' })
+  }
 }))
+
 
 // 설문지 단건 조회
 router.post('/my-form/one', isAuth, expressAsyncHandler(async (req, res) => {
